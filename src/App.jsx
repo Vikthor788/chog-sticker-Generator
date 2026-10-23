@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { generateSticker } from "./utils/generateSticker";
 import { getUserChogs } from "./utils/chog";
+import { generateStickerWithAI } from "./utils/generateWithReplicate";
 
 const REACTIONS = ["neutral", "happy", "angry", "shocked", "laughing", "cool"];
 
@@ -13,6 +13,7 @@ export default function App() {
   const [sticker, setSticker] = useState(null);
   const [activeTab, setActiveTab] = useState("generate");
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [messages, setMessages] = useState([
     { id: 1, chogId: 482, text: "just made my angry sticker", sticker: null },
   ]);
@@ -47,13 +48,26 @@ export default function App() {
   }, [account]);
 
   const handleGenerate = async () => {
-    if (!selectedChog?.image) return alert("No Chog image found");
-    const result = await generateSticker(
-      selectedChog.image,
-      selectedReaction,
-      selectedChog.id
-    );
-    setSticker(result);
+    if (!selectedChog?.image) {
+      alert("No Chog image available");
+      return;
+    }
+
+    setGenerating(true);
+    setSticker(null);
+
+    try {
+      const imageUrl = await generateStickerWithAI(
+        selectedChog.image,
+        selectedReaction
+      );
+      setSticker(imageUrl);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate sticker. Please try again.");
+    }
+
+    setGenerating(false);
   };
 
   const sendMessage = () => {
@@ -168,7 +182,7 @@ export default function App() {
             ))}
           </div>
 
-          {/* GENERATE */}
+          {/* GENERATE TAB */}
           {activeTab === "generate" && selectedChog && (
             <div>
               <div className="flex flex-wrap gap-3 mb-8">
@@ -189,9 +203,10 @@ export default function App() {
 
               <button
                 onClick={handleGenerate}
-                className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 px-10 py-5 rounded-2xl font-black text-xl shadow-xl shadow-fuchsia-500/20 mb-10"
+                disabled={generating}
+                className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 px-10 py-5 rounded-2xl font-black text-xl shadow-xl shadow-fuchsia-500/20 mb-10 disabled:opacity-60"
               >
-                Generate {selectedReaction}
+                {generating ? "Generating..." : `Generate ${selectedReaction}`}
               </button>
 
               {sticker && (
@@ -217,7 +232,7 @@ export default function App() {
             </div>
           )}
 
-          {/* CHAT */}
+          {/* CHAT TAB */}
           {activeTab === "chat" && (
             <div className="bg-purple-950/30 border border-purple-500/20 rounded-3xl overflow-hidden">
               <div className="p-5 border-b border-purple-500/20">
