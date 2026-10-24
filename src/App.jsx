@@ -111,14 +111,23 @@ export default function App() {
             <p className="text-xs text-purple-400 mt-1">Holders only • Generate & trade</p>
           </div>
 
-          {!account ? (
-            <button
-              onClick={connect}
-              className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 px-7 py-3 rounded-2xl font-bold shadow-lg shadow-fuchsia-500/20"
-            >
-              Connect Wallet
-            </button>
-          ) : (
+         {!account ? (
+      <div className="relative max-w-4xl mx-auto text-center px-6 py-32">
+        <h2 className="text-6xl md:text-7xl font-black tracking-tighter mb-6 bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+      TURN YOUR CHOG<br />INTO STICKERS
+        </h2>
+        <p className="text-xl text-purple-300 mb-10 max-w-2xl mx-auto">
+      Generate custom reaction stickers from your Chog and share them with other holders.
+        </p>
+        <button
+          onClick={connect}
+          className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-fuchsia-500/30"
+          >
+     Connect Wallet
+        </button>
+        <p className="text-sm text-purple-500 mt-6">Holders only</p>
+      </div>
+    ) : loading ? (
             <div className="text-right">
               <p className="text-sm font-medium">
                 {account.slice(0, 6)}...{account.slice(-4)}
